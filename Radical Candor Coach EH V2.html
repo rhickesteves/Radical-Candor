@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radical Candor Coach (Remote Team)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom spinner styles using white for visibility on the dark button */
+        .lds-ring {
+            display: inline-block;
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
+        .lds-ring div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: 2px;
+            border: 2px solid #fdfbff; /* Use Primary 3 for spinner */
+            border-radius: 50%;
+            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #fdfbff transparent transparent transparent; /* Use Primary 3 */
+        }
+        .lds-ring div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+        .lds-ring div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+        .lds-ring div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+        @keyframes lds-ring {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#ECE5F1] text-[#2d0649] flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-2xl mx-auto p-4 sm:p-6 md:p-8">
+        <div class="bg-[#fdfbff] rounded-2xl shadow-lg p-6 sm:p-8">
+            <header class="text-center mb-8">
+                <h1 class="text-3xl sm:text-4xl font-bold text-[#2d0649]">Radical Candor Coach</h1>
+                <p class="text-[#460078] mt-2">Practice giving feedback that is both caring and direct.</p>
+            </header>
+
+            <main>
+                <form id="feedback-form">
+                    <div class="mb-4">
+                        <label for="feedback-input" class="block text-sm font-medium text-[#2d0649] mb-2">Enter your feedback message:</label>
+                        <textarea id="feedback-input" rows="4" class="w-full p-3 border border-[#a569ff] rounded-lg focus:ring-2 focus:ring-[#7622d7] focus:border-[#7622d7] transition-shadow duration-200 bg-[#fdfbff] placeholder:text-[#460078]/60" placeholder="e.g., Your presentation was good, but you seemed a bit nervous."></textarea>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button type="submit" id="submit-btn" class="w-full sm:w-auto flex-grow bg-[#7622d7] text-[#fdfbff] font-semibold py-3 px-6 rounded-lg hover:bg-[#460078] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a569ff] transition-colors duration-200 flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square-heart"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M17.8 12.2a2.7 2.7 0 0 0-3.8 0l-.2.2-.2-.2a2.7 2.7 0 0 0-3.8 0A2.7 2.7 0 0 0 10 16s.5 2 2 2 2-2 2-2a2.7 2.7 0 0 0-.2-3.8Z"/></svg>
+                            Evaluate Feedback
+                        </button>
+                        <button type="button" id="reset-btn" class="w-full sm:w-auto bg-[#ECE5F1] text-[#460078] font-semibold py-3 px-6 rounded-lg hover:bg-[#a569ff]/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#a569ff] transition-colors duration-200">
+                            Clear
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="hidden text-center my-6">
+                    <div role="status" class="inline-flex items-center">
+                         <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin fill-[#7622d7]" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                        </svg>
+                        <span class="text-[#460078] font-medium">Evaluating...</span>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="error-message" class="hidden my-6 p-4 bg-red-100 border border-red-300 text-red-800 rounded-lg"></div>
+
+                <!-- Results -->
+                <div id="results-container" class="hidden mt-8 space-y-6">
+                    <!-- Radical Candor Quadrant -->
+                     <div>
+                        <h3 class="text-sm font-semibold text-[#460078] uppercase tracking-wide mb-2">Analysis</h3>
+                        <div id="quadrant-card" class="p-4 rounded-lg">
+                            <p class="font-semibold text-lg" id="quadrant-name"></p>
+                            <p class="text-sm" id="quadrant-description"></p>
+                        </div>
+                    </div>
+
+                    <!-- What Was Good -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-[#460078] uppercase tracking-wide">What Was Good 👍</h3>
+                        <div class="mt-2 p-4 bg-[#a569ff]/10 text-[#460078] rounded-lg">
+                            <p id="what-was-good"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- What to Improve -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-[#460078] uppercase tracking-wide">What to Improve 💡</h3>
+                        <div class="mt-2 p-4 bg-[#7622d7]/15 text-[#2d0649] rounded-lg">
+                            <p id="what-to-improve"></p>
+                        </div>
+                    </div>
+
+                    <!-- Revised Suggestion -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-sm font-semibold text-[#460078] uppercase tracking-wide">Revised Suggestion</h3>
+                            <button type="button" id="rephrase-btn" class="hidden text-sm bg-[#a569ff]/20 text-[#460078] font-semibold py-1 px-3 rounded-full hover:bg-[#a569ff]/40 transition-colors duration-200 flex items-center gap-1">
+                                ✨ Get Alternatives
+                            </button>
+                        </div>
+                        <div class="p-4 bg-[#ECE5F1] rounded-lg">
+                            <p id="revised-suggestion" class="text-[#2d0649]"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Rephrase Suggestions -->
+                    <div id="rephrase-results-container" class="hidden">
+                        <h3 class="text-sm font-semibold text-[#460078] uppercase tracking-wide">Alternative Phrasings ✨</h3>
+                        <div id="rephrase-loading" class="hidden mt-2 text-center text-[#460078]">
+                            Generating ideas...
+                        </div>
+                        <div id="rephrase-list" class="mt-2 space-y-2">
+                            <!-- Suggestions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <footer class="text-center mt-6 text-sm text-[#460078]/70">
+            <!-- Removed the <p> tag that was here -->
+        </footer>
+    </div>
+
+    <script>
+        const form = document.getElementById('feedback-form');
+        const feedbackInput = document.getElementById('feedback-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const errorMessage = document.getElementById('error-message');
+        const resultsContainer = document.getElementById('results-container');
+        
+        const rephraseBtn = document.getElementById('rephrase-btn');
+        const rephraseResultsContainer = document.getElementById('rephrase-results-container');
+        const rephraseLoading = document.getElementById('rephrase-loading');
+        const rephraseList = document.getElementById('rephrase-list');
+        let currentRevisedSuggestion = '';
+        
+        // --- API Details ---
+        const API_KEY = "AIzaSyA-yAktMOVdyWkugUL05LiHBAyonJFesUw"; // The API Key will be provided by the environment.
+        const AI_MODEL = "gemini-2.5-flash-preview-09-2025"; // Updated model
+
+        const QUADRANT_DETAILS = {
+            "Radical Candor": {
+                color: "bg-[#7622d7]/10 text-[#460078]",
+                description: "This feedback Cares Personally and Challenges Directly. It's specific, sincere, and helpful."
+            },
+            "Obnoxious Aggression": {
+                color: "bg-red-100 text-red-800",
+                description: "This feedback Challenges Directly but doesn't show you Care Personally. It can feel harsh or unkind."
+            },
+            "Ruinous Empathy": {
+                color: "bg-yellow-100 text-yellow-800",
+                description: "This feedback Cares Personally but fails to Challenge Directly. It's praise that isn't specific enough to help the person repeat their success or criticism that is sugarcoated and unclear."
+            },
+            "Manipulative Insincerity": {
+                color: "bg-[#ECE5F1] text-[#460078]",
+                description: "This feedback doesn't Care Personally or Challenge Directly. It's praise that is insincere or criticism that is not clear and specific."
+            }
+        };
+
+
+        // --- Event Listeners ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const feedback = feedbackInput.value.trim();
+            if (feedback) {
+                await getFeedbackAnalysis(feedback);
+            } else {
+                showError("Please enter a feedback message.");
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            feedbackInput.value = '';
+            hideError();
+            hideResults();
+            feedbackInput.focus();
+        });
+
+        rephraseBtn.addEventListener('click', async () => {
+            if (currentRevisedSuggestion) {
+                await getAlternativePhrasings(currentRevisedSuggestion);
+            }
+        });
+        
+        // --- Core Logic ---
+        async function getFeedbackAnalysis(feedback) {
+            setLoading(true);
+            hideError();
+            hideResults();
+
+            // *** MODIFIED PROMPT ***
+            const systemPrompt = `You are an expert leadership coach specialising in the Radical Candor framework by Kim Scott, focusing exclusively on a fully remote team. **Assume all interactions are digital (e.g., video calls, Slack, email, shared docs). All generated output MUST be relevant to a remote work environment and avoid any mention of in-office or face-to-face interactions.**
+
+            Your task is to:
+            1. Analyse the manager's feedback for a team member based on the principles of 'Care Personally' and 'Challenge Directly' within a remote context.
+            2. Identify what was good about the feedback (e.g., "You started to show you care personally by...").
+            3. Identify what could be improved to better align with Radical Candor (e.g., "To Challenge Directly, you could specify the exact observation...").
+            4. Classify the feedback into one of the four quadrants: "Radical Candor", "Obnoxious Aggression", "Ruinous Empathy", or "Manipulative Insincerity".
+            5. Provide a revised version of the feedback that exemplifies Radical Candor in a remote setting (e.g., starting with "In our team call...").
+            
+            All your responses, explanations, and suggestions must use Australian English spelling (e.g., 'specialising').`;
+            
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${API_KEY}`;
+            
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: feedback }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "what_was_good": { "type": "STRING", "description": "Positive aspects of the feedback aligned with Radical Candor." },
+                            "what_to_improve": { "type": "STRING", "description": "How the feedback could be more caring or more direct." },
+                            "radical_candor_quadrant": { 
+                                "type": "STRING", 
+                                "enum": ["Radical Candor", "Obnoxious Aggression", "Ruinous Empathy", "Manipulative Insincerity"],
+                                "description": "The Radical Candor quadrant this feedback falls into."
+                             },
+                            "revised_suggestion": { "type": "STRING", "description": "A rewritten version of the feedback that better exemplifies Radical Candor." }
+                        },
+                        required: ["what_was_good", "what_to_improve", "radical_candor_quadrant", "revised_suggestion"]
+                    }
+                }
+            };
+
+            try {
+                // Exponential backoff for retries
+                let response;
+                let delay = 1000;
+                for (let i = 0; i < 5; i++) {
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) break;
+                    if (response.status === 429 || response.status >= 500) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        break; // Don't retry for other errors (e.g., 400)
+                    }
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error("API Error Response:", errorData);
+                    throw new Error(errorData.error?.message || `API request failed with status ${response.status}. Check API Key and permissions.`);
+                }
+
+                const data = await response.json();
+                const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!content) throw new Error("Received an empty or invalid response from the AI.");
+
+                const analysis = JSON.parse(content);
+                displayResults(analysis);
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                showError(error.message || "An unexpected error occurred.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function getAlternativePhrasings(feedback) {
+            rephraseLoading.classList.remove('hidden');
+            rephraseBtn.disabled = true;
+            rephraseList.innerHTML = '';
+            rephraseResultsContainer.classList.remove('hidden');
+            hideError();
+
+            // *** MODIFIED PROMPT ***
+            const systemPrompt = `You are an expert writer and leadership coach, specialising in remote team dynamics. Rephrase the user's feedback message in 3 different ways to make it more effective, each demonstrating Radical Candor. **Crucially, all suggestions MUST be appropriate for a fully remote team (e.g., referencing video calls, Slack, shared docs) and must not mention in-office or face-to-face work.** Ensure all your suggestions use Australian English spelling (e.g., 'specialising').`;
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${API_KEY}`;
+            
+            const payload = {
+                contents: [{ parts: [{ text: feedback }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "suggestions": { "type": "ARRAY", "items": { "type": "STRING" }, "description": "An array of 3 rephrased feedback messages." }
+                        },
+                        required: ["suggestions"]
+                    }
+                }
+            };
+
+            try {
+                 // Exponential backoff for retries
+                let response;
+                let delay = 1000;
+                for (let i = 0; i < 5; i++) {
+                    response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (response.ok) break;
+                    if (response.status === 429 || response.status >= 500) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `API request failed with status ${response.status}.`);
+                }
+
+                const data = await response.json();
+                const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!content) throw new Error("Received an empty response for suggestions.");
+
+                const parsedContent = JSON.parse(content);
+                displayRephraseResults(parsedContent.suggestions);
+
+            } catch (error) {
+                console.error("Rephrase Error:", error);
+                showError("Sorry, I couldn't generate suggestions. " + error.message);
+                rephraseResultsContainer.classList.add('hidden');
+            } finally {
+                rephraseLoading.classList.add('hidden');
+                rephraseBtn.disabled = false;
+            }
+        }
+        
+        // --- UI Update Functions ---
+        function setLoading(isLoading) {
+            const buttonText = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square-heart"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M17.8 12.2a2.7 2.7 0 0 0-3.8 0l-.2.2-.2-.2a2.7 2.7 0 0 0-3.8 0A2.7 2.7 0 0 0 10 16s.5 2 2 2 2-2 2-2a2.7 2.7 0 0 0-.2-3.8Z"/></svg>
+                Evaluate Feedback`;
+
+            if (isLoading) {
+                loadingIndicator.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `<div class="lds-ring"><div></div><div></div><div></div><div></div></div> Evaluating...`;
+            } else {
+                loadingIndicator.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = buttonText;
+            }
+        }
+        
+        function displayResults(analysis) {
+            const { what_was_good, what_to_improve, radical_candor_quadrant, revised_suggestion } = analysis;
+            
+            const quadrantCard = document.getElementById('quadrant-card');
+            const quadrantName = document.getElementById('quadrant-name');
+            const quadrantDescription = document.getElementById('quadrant-description');
+
+            const quadrantInfo = QUADRANT_DETAILS[radical_candor_quadrant] || QUADRANT_DETAILS["Manipulative Insincerity"];
+            quadrantCard.className = `p-4 rounded-lg ${quadrantInfo.color}`;
+            quadrantName.textContent = radical_candor_quadrant;
+            quadrantDescription.textContent = quadrantInfo.description;
+
+            document.getElementById('what-was-good').textContent = what_was_good;
+            document.getElementById('what-to-improve').textContent = what_to_improve;
+            document.getElementById('revised-suggestion').textContent = revised_suggestion;
+            
+            resultsContainer.classList.remove('hidden');
+            currentRevisedSuggestion = revised_suggestion;
+            rephraseBtn.classList.remove('hidden');
+        }
+
+        function displayRephraseResults(suggestions) {
+            rephraseList.innerHTML = '';
+            if (suggestions && suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 bg-[#fdfbff] border border-[#a569ff]/50 rounded-md text-[#2d0649] hover:bg-[#ECE5F1] cursor-pointer transition-colors';
+                    div.textContent = suggestion;
+                    div.title = "Click to copy";
+                    div.onclick = () => {
+                        const textArea = document.createElement("textarea");
+                        textArea.value = suggestion;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                           // Use document.execCommand as a fallback for iframe environments
+                           document.execCommand('copy');
+                           // You could add a temporary "Copied!" message here
+                        } catch (err) {
+                           console.error('Fallback: Oops, unable to copy', err);
+                        }
+                        document.body.removeChild(textArea);
+                    };
+                    rephraseList.appendChild(div);
+                });
+            } else {
+                const div = document.createElement('div');
+                div.className = 'p-3 bg-[#fdfbff] border border-[#a569ff]/50 rounded-md text-[#2d0649]';
+                div.textContent = 'No suggestions available.';
+                rephraseList.appendChild(div);
+            }
+            rephraseResultsContainer.classList.remove('hidden');
+        }
+
+        function hideResults() {
+            resultsContainer.classList.add('hidden');
+            rephraseBtn.classList.add('hidden');
+            rephraseResultsContainer.classList.add('hidden');
+            rephraseList.innerHTML = '';
+            currentRevisedSuggestion = '';
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
